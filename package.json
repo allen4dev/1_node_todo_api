@@ -11,6 +11,7 @@
   "author": "Alan Aliaga <alanaliagadev@gmail.com> (https://twitter.com/allen4dev)",
   "license": "ISC",
   "devDependencies": {
+    "morgan": "^1.9.0",
     "nodemon": "^1.12.1"
   },
   "dependencies": {
