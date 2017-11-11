@@ -4,10 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "watch": "nodemon --exec 'npm start'",
     "start": "node index.js"
   },
   "keywords": [],
-  "author":
-    "Alan Aliaga <alanaliagadev@gmail.com> (https://twitter.com/allen4dev)",
-  "license": "ISC"
+  "author": "Alan Aliaga <alanaliagadev@gmail.com> (https://twitter.com/allen4dev)",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.12.1"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "mongoose": "^4.13.1"
+  }
 }
