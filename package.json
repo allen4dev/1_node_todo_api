@@ -1,0 +1,13 @@
+{
+  "name": "1_node_todo_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author":
+    "Alan Aliaga <alanaliagadev@gmail.com> (https://twitter.com/allen4dev)",
+  "license": "ISC"
+}
