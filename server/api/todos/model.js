@@ -16,10 +16,10 @@ const TodoSchema = new Schema({
     type: Date,
     default: Date.now(),
   },
-  updatedAt: {
+  completedAt: {
     type: Date,
     default: null,
-  }
+  },
   // author        _id reference to User model (populate this)
 });
 

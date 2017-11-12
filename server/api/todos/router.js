@@ -11,6 +11,10 @@ router
   .get(controller.get)
   .post(controller.post);
 
-router.route('/:id').get(controller.getSingle);
+router
+  .route('/:id')
+  .get(controller.getSingle)
+  .put(controller.updateOne)
+  .delete(controller.deleteOne);
 
 module.exports = router;
