@@ -16,12 +16,15 @@ exports.post = (req, res, next) => {
   const { email, password } = req.body;
   const user = new User({ email, password });
 
-  user.save().then(created => {
-    if (!created)
-      return next(new Error('An error ocurred during creation of user'));
+  user
+    .save()
+    .then(created => {
+      if (!created)
+        return next(new Error('An error ocurred during creation of user'));
 
-    res.status(200).send({ user: created });
-  });
+      res.status(200).send({ user: created });
+    })
+    .catch(next);
 };
 
 // Route: /:id
