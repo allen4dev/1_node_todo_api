@@ -1,8 +1,19 @@
 const Todo = require('./model');
 
-exports.get = (req, res, next) => {
-  return next(new Error('Testing error handler middleware'));
+exports.param = (req, res, next, id) => {
+  Todo.findById(id)
+    .then(todo => {
+      if (!todo) return next(new Error(`Todo with id ${id} not found`));
 
+      req.todo = todo;
+      next();
+    })
+    .catch(err => {
+      next(err);
+    });
+};
+
+exports.get = (req, res, next) => {
   Todo.find({}).then(todos => {
     res.status(200).send({ todos });
   });
@@ -14,4 +25,8 @@ exports.post = (req, res) => {
   todo.save().then(created => {
     res.status(200).send({ todo: created });
   });
+};
+
+exports.getSingle = (req, res) => {
+  res.send({ todo: req.todo });
 };

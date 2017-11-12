@@ -4,6 +4,7 @@ const http = require('http');
 
 const app = require('./server');
 
+const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 
-server.listen(8080, () => console.log('Server running in port 8080'));
+server.listen(PORT, () => console.log(`Server running in port ${PORT}`));

@@ -12,8 +12,7 @@ app.use('/api', api);
 
 // Error handler middleware
 app.use(function(err, req, res, next) {
-  console.log('ERROR: ', err.message);
-  res.status(500).send('Oops');
+  res.status(500).send({ error: err.message });
 });
 
 module.exports = app;
