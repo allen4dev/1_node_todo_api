@@ -22,3 +22,21 @@ exports.ensureAuth = (req, res, next) => {
       });
   });
 };
+
+exports.authenticate = (req, res, next) => {
+  const { email, password } = req.body;
+
+  User.authenticate(email, password)
+    .then(user => {
+      console.log('User', user);
+      req.user = user;
+      next();
+    })
+    .catch(next);
+};
+
+exports.signToken = (req, res, next) => {
+  const token = jwt.sign({ id: req.user._id }, 'secret');
+  req.token = token;
+  next();
+};

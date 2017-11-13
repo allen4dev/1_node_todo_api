@@ -62,6 +62,20 @@ UserSchema.statics.findByToken = function findUserByToken(token) {
   return this.findById(decoded.id);
 };
 
+UserSchema.statics.authenticate = function authenticateWithCredentials(
+  email,
+  password,
+) {
+  return this.findOne({ email }).then(user => {
+    if (!user) return Promise.reject();
+
+    return bcrypt.compare(password, user.password).then(res => {
+      if (res) return user;
+      return Promise.reject();
+    });
+  });
+};
+
 UserSchema.pre('save', function hashPassword(next) {
   if (this.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
