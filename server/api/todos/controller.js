@@ -3,7 +3,7 @@ const Todo = require('./model');
 // Route: .param(id)
 exports.param = (req, res, next, id) => {
   Todo.findById(id)
-    .populate('author')
+    .populate('author categories')
     .then(todo => {
       if (!todo) return next(new Error(`Todo with id ${id} not found`));
 
@@ -26,8 +26,9 @@ exports.get = (req, res) => {
 
 exports.post = (req, res, next) => {
   // const { body } = req.body;
-  const { body: { body }, user } = req;
-  const todo = new Todo({ body, author: user.id });
+  const { body, user } = req;
+  body.author = user.id;
+  const todo = new Todo(body);
 
   todo
     .save()
@@ -46,8 +47,8 @@ exports.updateOne = (req, res, next) => {
   const { todo, user } = req;
   // const { body, completed } = req.body;
   const { body } = req;
-  const updatedTodo = body;
-
+  const { categories, ...updatedTodo } = body;
+  console.log(categories);
   if (typeof body.completed === 'boolean' && body.completed) {
     updatedTodo.completedAt = Date.now();
   } else {
@@ -57,9 +58,16 @@ exports.updateOne = (req, res, next) => {
 
   // updatedTodo.body = body || todo.body;
 
-  Todo.findOneAndUpdate({ _id: todo.id, author: user.id }, updatedTodo, {
-    new: true,
-  }).then(updated => {
+  Todo.findOneAndUpdate(
+    { _id: todo.id, author: user.id },
+    {
+      ...updatedTodo,
+      $addToSet: { categories: { $each: categories } },
+    },
+    {
+      new: true,
+    },
+  ).then(updated => {
     if (!updated) return res.status(404).send({});
     res.send({ todo: updated });
   });
@@ -73,4 +81,23 @@ exports.deleteOne = (req, res, next) => {
 
     res.send({ todo: deleted });
   });
+};
+
+// Route: /category/:categoryId
+exports.getByCategory = (req, res, next) => {
+  Todo.find({
+    author: req.user._id,
+    categories: {
+      $in: [req.params.categoryId],
+    },
+  })
+    .then(todos => {
+      if (!todos)
+        return next(
+          new Error(`No todos for category: ${req.params.categoryId}`),
+        );
+
+      res.status(200).send({ todos });
+    })
+    .catch(next);
 };

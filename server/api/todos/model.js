@@ -2,11 +2,6 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const TodoSchema = new Schema({
-  author: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
   body: {
     type: String,
     minlength: 1,
@@ -25,7 +20,17 @@ const TodoSchema = new Schema({
     type: Date,
     default: null,
   },
-  // author        _id reference to User model (populate this)
+  author: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  categories: [
+    {
+      type: Schema.Types.ObjectId,
+      reference: 'Category',
+    },
+  ],
 });
 
 const Todo = mongoose.model('Todo', TodoSchema);

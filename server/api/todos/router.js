@@ -19,4 +19,6 @@ router
   .put(ensureAuth, controller.updateOne)
   .delete(ensureAuth, controller.deleteOne);
 
+router.get('/categories/:categoryId', ensureAuth, controller.getByCategory);
+
 module.exports = router;

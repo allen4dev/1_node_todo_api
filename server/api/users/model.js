@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const uuid = require('uuid');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -16,9 +15,7 @@ const UserSchema = new Schema({
   username: {
     type: String,
     trim: true,
-    minlength: 1,
-    unique: true,
-    default: `User-${uuid()}`,
+    default: '',
   },
 
   email: {
