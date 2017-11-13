@@ -11,6 +11,7 @@ exports.param = (req, res, next, id) => {
     })
     .catch(next);
 };
+
 // Route: /
 exports.post = (req, res, next) => {
   const { email, password } = req.body;
@@ -18,11 +19,12 @@ exports.post = (req, res, next) => {
 
   user
     .save()
-    .then(created => {
-      if (!created)
-        return next(new Error('An error ocurred during creation of user'));
-
-      res.status(200).send({ user: created });
+    .then(() => user.generateAuthToken())
+    .then(token => {
+      res
+        .status(200)
+        .header('Authorization', `Bearer ${token}`)
+        .send({ user });
     })
     .catch(next);
 };
@@ -34,8 +36,8 @@ exports.getSingle = (req, res, next) => {
 
 exports.updateOne = (req, res, next) => {
   const { body: { fullname, username }, user } = req;
-
-  User.findOneAndUpdate(user.id, { fullname, username }, { new: true })
+  console.log('UPDATED_ID', user);
+  User.findByIdAndUpdate(user.id, { fullname, username }, { new: true })
     .then(updated => {
       if (!updated) return res.status(404).send({});
 
@@ -45,7 +47,7 @@ exports.updateOne = (req, res, next) => {
 };
 
 exports.deleteOne = (req, res, next) => {
-  User.findOneAndRemove(req.user.id).then(removed => {
+  User.findByIdAndRemove(req.user.id).then(removed => {
     if (!removed) return res.status(404).send({});
 
     res.status(200).send({ user: removed });

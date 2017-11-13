@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const uuid = require('uuid');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const { Schema } = mongoose;
 
@@ -43,6 +44,24 @@ const UserSchema = new Schema({
     default: Date.now(),
   },
 });
+
+UserSchema.methods.generateAuthToken = function generateToken() {
+  const token = jwt.sign({ id: this.id }, 'secret');
+  return Promise.resolve(token);
+};
+
+UserSchema.statics.findByToken = function findUserByToken(token) {
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, 'secret');
+  } catch (e) {
+    return Promise.reject();
+  }
+
+  console.log('DECODED: ', decoded);
+  return this.findById(decoded.id);
+};
 
 UserSchema.pre('save', function hashPassword(next) {
   if (this.isModified('password')) {
