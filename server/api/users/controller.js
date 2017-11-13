@@ -34,10 +34,15 @@ exports.getSingle = (req, res, next) => {
   res.send({ user: req.user });
 };
 
+exports.getMe = (req, res, next) => {
+  res.send({ user: req.user });
+};
+
 exports.updateOne = (req, res, next) => {
-  const { body: { fullname, username }, user } = req;
-  console.log('UPDATED_ID', user);
-  User.findByIdAndUpdate(user.id, { fullname, username }, { new: true })
+  // const { body: { fullname, username }, user } = req;
+  const { body, user } = req;
+
+  User.findByIdAndUpdate(user.id, body, { new: true })
     .then(updated => {
       if (!updated) return res.status(404).send({});
 

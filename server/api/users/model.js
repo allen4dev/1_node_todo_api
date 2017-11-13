@@ -59,7 +59,6 @@ UserSchema.statics.findByToken = function findUserByToken(token) {
     return Promise.reject();
   }
 
-  console.log('DECODED: ', decoded);
   return this.findById(decoded.id);
 };
 

@@ -10,6 +10,7 @@ router.post('/', controller.post);
 
 router
   .route('/me')
+  .get(ensureAuth, controller.getMe)
   .put(ensureAuth, controller.updateOne)
   .delete(ensureAuth, controller.deleteOne);
 

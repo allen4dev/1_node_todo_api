@@ -3,6 +3,7 @@ const Todo = require('./model');
 // Route: .param(id)
 exports.param = (req, res, next, id) => {
   Todo.findById(id)
+    .populate('author')
     .then(todo => {
       if (!todo) return next(new Error(`Todo with id ${id} not found`));
 
@@ -16,14 +17,17 @@ exports.param = (req, res, next, id) => {
 
 // Route: /
 exports.get = (req, res) => {
-  Todo.find({}).then(todos => {
+  Todo.find({
+    author: req.user.id,
+  }).then(todos => {
     res.status(200).send({ todos });
   });
 };
 
-exports.post = (req, res) => {
-  const { body } = req.body;
-  const todo = new Todo({ body });
+exports.post = (req, res, next) => {
+  // const { body } = req.body;
+  const { body: { body }, user } = req;
+  const todo = new Todo({ body, author: user.id });
 
   todo
     .save()
@@ -39,29 +43,32 @@ exports.getSingle = (req, res) => {
 };
 
 exports.updateOne = (req, res, next) => {
-  const todo = req.todo;
-  const { body, completed } = req.body;
-  const updatedTodo = { body, completed };
+  const { todo, user } = req;
+  // const { body, completed } = req.body;
+  const { body } = req;
+  const updatedTodo = body;
 
-  if (typeof completed === 'boolean' && completed) {
+  if (typeof body.completed === 'boolean' && body.completed) {
     updatedTodo.completedAt = Date.now();
   } else {
     updatedTodo.completedAt = null;
     updatedTodo.completed = false;
   }
 
-  updatedTodo.body = body || todo.body;
+  // updatedTodo.body = body || todo.body;
 
-  Todo.findOneAndUpdate(todo.id, updatedTodo, { new: true }).then(updated => {
+  Todo.findOneAndUpdate({ _id: todo.id, author: user.id }, updatedTodo, {
+    new: true,
+  }).then(updated => {
     if (!updated) return res.status(404).send({});
     res.send({ todo: updated });
   });
 };
 
 exports.deleteOne = (req, res, next) => {
-  const todo = req.todo;
+  const { todo, user } = req;
 
-  Todo.findOneAndRemove(todo.id).then(deleted => {
+  Todo.findOneAndRemove({ _id: todo.id, author: user.id }).then(deleted => {
     if (!deleted) return res.status(404).send({});
 
     res.send({ todo: deleted });
