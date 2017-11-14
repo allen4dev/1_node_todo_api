@@ -12,12 +12,6 @@ require('./middlewares/appMiddleware')(app);
 app.use('/api', api);
 app.use('/auth', auth);
 
-app.get('/', (req, res) => {
-  res.sendFile(`${__dirname}/views/index.html`, {
-    title: 'My first nodejs practice',
-  });
-});
-
 // Error handler middleware
 app.use(function(err, req, res, next) {
   if (err.message.match(/not found/)) {
