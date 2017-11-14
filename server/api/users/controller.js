@@ -44,7 +44,8 @@ exports.updateOne = (req, res, next) => {
 
   User.findByIdAndUpdate(user.id, body, { new: true })
     .then(updated => {
-      if (!updated) return res.status(404).send({});
+      if (!updated)
+        return Promise.reject(new Error(`User ${user.id} not found`));
 
       res.status(200).send({ user: updated });
     })
@@ -52,9 +53,11 @@ exports.updateOne = (req, res, next) => {
 };
 
 exports.deleteOne = (req, res, next) => {
-  User.findByIdAndRemove(req.user.id).then(removed => {
-    if (!removed) return res.status(404).send({});
+  User.findByIdAndRemove(req.user.id)
+    .then(removed => {
+      if (!removed) return Promise.reject(new Error('User not found'));
 
-    res.status(200).send({ user: removed });
-  });
+      res.status(200).send({ user: removed });
+    })
+    .catch(next);
 };

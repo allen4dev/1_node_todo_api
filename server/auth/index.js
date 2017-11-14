@@ -7,19 +7,17 @@ const User = require('./../api/users/model');
 
 exports.ensureAuth = (req, res, next) => {
   const token = bearer(req, (err, token) => {
-    if (err) return next(err);
+    if (err) return next(new Error('Unauthorized'));
 
     User.findByToken(token)
       .then(user => {
-        if (!user) return Promise.reject();
+        if (!user) return next(new Error('User not found'));
 
         req.user = user;
         // req.token = token;
         next();
       })
-      .catch(e => {
-        res.status(401).send({});
-      });
+      .catch(next);
   });
 };
 
@@ -28,7 +26,6 @@ exports.authenticate = (req, res, next) => {
 
   User.authenticate(email, password)
     .then(user => {
-      console.log('User', user);
       req.user = user;
       next();
     })

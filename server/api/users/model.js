@@ -9,7 +9,7 @@ const UserSchema = new Schema({
   fullname: {
     type: String,
     trim: true,
-    minlength: 2,
+    default: '',
   },
 
   username: {
@@ -53,7 +53,7 @@ UserSchema.statics.findByToken = function findUserByToken(token) {
   try {
     decoded = jwt.verify(token, 'secret');
   } catch (e) {
-    return Promise.reject();
+    return Promise.reject(new Error('Invalid token'));
   }
 
   return this.findById(decoded.id);
@@ -61,14 +61,14 @@ UserSchema.statics.findByToken = function findUserByToken(token) {
 
 UserSchema.statics.authenticate = function authenticateWithCredentials(
   email,
-  password,
+  password
 ) {
   return this.findOne({ email }).then(user => {
-    if (!user) return Promise.reject();
+    if (!user) return Promise.reject(new Error('Invalid email'));
 
     return bcrypt.compare(password, user.password).then(res => {
       if (res) return user;
-      return Promise.reject();
+      return Promise.reject(new Error('Invalid password'));
     });
   });
 };

@@ -12,8 +12,22 @@ require('./middlewares/appMiddleware')(app);
 app.use('/api', api);
 app.use('/auth', auth);
 
+app.get('/', (req, res) => {
+  res.sendFile(`${__dirname}/views/index.html`, {
+    title: 'My first nodejs practice',
+  });
+});
+
 // Error handler middleware
 app.use(function(err, req, res, next) {
+  if (err.message.match(/not found/)) {
+    return res.status(404).send({ error: err.message });
+  }
+
+  if (err.message.match(/Unauthorized/)) {
+    return res.status(401).send({ error: err.message });
+  }
+
   res.status(500).send({ error: err.message });
 });
 

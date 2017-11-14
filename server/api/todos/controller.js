@@ -10,9 +10,7 @@ exports.param = (req, res, next, id) => {
       req.todo = todo;
       next();
     })
-    .catch(err => {
-      next(err);
-    });
+    .catch(next);
 };
 
 // Route: /
@@ -35,7 +33,7 @@ exports.post = (req, res, next) => {
     .then(created => {
       res.status(200).send({ todo: created });
     })
-    .catch(err => next(err));
+    .catch(next);
 };
 
 // Route: /:id
@@ -47,8 +45,8 @@ exports.updateOne = (req, res, next) => {
   const { todo, user } = req;
   // const { body, completed } = req.body;
   const { body } = req;
-  const { categories, ...updatedTodo } = body;
-  console.log(categories);
+  let { categories, ...updatedTodo } = body;
+
   if (typeof body.completed === 'boolean' && body.completed) {
     updatedTodo.completedAt = Date.now();
   } else {
@@ -56,7 +54,9 @@ exports.updateOne = (req, res, next) => {
     updatedTodo.completed = false;
   }
 
-  // updatedTodo.body = body || todo.body;
+  if (!categories) {
+    categories = [];
+  }
 
   Todo.findOneAndUpdate(
     { _id: todo.id, author: user.id },
@@ -66,21 +66,28 @@ exports.updateOne = (req, res, next) => {
     },
     {
       new: true,
-    },
-  ).then(updated => {
-    if (!updated) return res.status(404).send({});
-    res.send({ todo: updated });
-  });
+    }
+  )
+    .then(updated => {
+      if (!updated)
+        return Promise.reject(new Error(`Todo ${todo.id} not found`));
+
+      res.send({ todo: updated });
+    })
+    .catch(next);
 };
 
 exports.deleteOne = (req, res, next) => {
   const { todo, user } = req;
 
-  Todo.findOneAndRemove({ _id: todo.id, author: user.id }).then(deleted => {
-    if (!deleted) return res.status(404).send({});
+  Todo.findOneAndRemove({ _id: todo.id, author: user.id })
+    .then(deleted => {
+      if (!deleted)
+        return Promise.reject(new Error(`Todo ${todo.id} not found`));
 
-    res.send({ todo: deleted });
-  });
+      res.send({ todo: deleted });
+    })
+    .catch(next);
 };
 
 // Route: /category/:categoryId
@@ -93,8 +100,8 @@ exports.getByCategory = (req, res, next) => {
   })
     .then(todos => {
       if (!todos)
-        return next(
-          new Error(`No todos for category: ${req.params.categoryId}`),
+        return Promise.reject(
+          new Error(`No todos for category: ${req.params.categoryId}`)
         );
 
       res.status(200).send({ todos });
